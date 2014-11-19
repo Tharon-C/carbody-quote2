@@ -1,5 +1,14 @@
 <?php
 /*
+Plugin Name: Car Selector
+Plugin URI: http://taglinegroup.com
+Description: Based on Car Query API, user selects car year, make, model, and trim to be dirceted to a page based on criteria. 
+Author: Tharon Carrlson
+
+Car Query API Doc
+Author URI: http://www.carqueryapi.com
+License: GPL2
+
 Plugin Name: Official CarQuery API Wordpress Plugin
 Plugin URI: http://www.carqueryapi.com/demo/wordpress-plugin/
 Description: The CarQuery API plugin easily creates dependent vehicle year, make, model, and trim dropdowns.
@@ -7,7 +16,6 @@ Version: 1.1
 Author: CarQueryAPI
 Author URI: http://www.carqueryapi.com
 License: GPL2
-
 Copyright 2012 CarQueryAPI  (email : dan@carqueryapi.com)
 
 This program is free software; you can redistribute it and/or modify
@@ -31,18 +39,8 @@ Class CarQueryAPI{
 
 	static function init() {
 
-		//Register ShortCodes
-		add_shortcode("cq-quote", 	array(__CLASS__, 'cq_quote' ));
-
-		add_shortcode("cq-year", 	array(__CLASS__, 'cq_year' ));
-		
-		add_shortcode("cq-make", 	array(__CLASS__, 'cq_make' ));
-		
-		add_shortcode("cq-model", 	array(__CLASS__, 'cq_model'));
-		
-		add_shortcode("cq-trim", 	array(__CLASS__, 'cq_trim' ));
-		
-		add_shortcode("cq-button", 	array(__CLASS__, 'cq_button' ));
+		//Register ShortCode
+		add_shortcode("cq-quote", 	array(__CLASS__, 'cq_quote' )); 
 		
 		//Load javascript in wp_footer
 		
@@ -184,130 +182,39 @@ static function cq_quote() {
      	function bodyStyle(){
      			var body = $("td:contains('Body Style:')").next().text();
      			console.log(body);
-     			if (body == "Pickup") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "SUV") {
-     				window.location.href = "http://localhost/theme_dev/price-b" ;
-     			}
-     			else if (body == "Sedan") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Coupe") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Compact Cars") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Convertible") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Minivan") {
-     				window.location.href = "http://localhost/theme_dev/price-c" ;
-     			}
-     			else if (body == "Cargo Vans") {
-     				window.location.href = "http://localhost/theme_dev/price-c" ;
-     			}
-     			else if (body == "Van") {
-     				window.location.href = "http://localhost/theme_dev/price-c" ;
-     			}
-     			else if (body == "Crossover") {
-     				window.location.href = "http://localhost/theme_dev/price-b" ;
-     			}
-     			else if (body == "Hatchback") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Larg Cars") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Midsize Cars") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Midsize Station Wagons") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Mini Compact Cars") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Panel Van") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Passenger Vans") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Roadster") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Small Pickup Trucks") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-     			else if (body == "Small Station Wagons") {
-     				window.location.href = "http://localhost/theme_dev/price-a" ;
-     			}
-	     			else {
+     			var select = {
+     				 "Pickup": 					"http://localhost/theme_dev/price-a"
+     				,"SUV":						"http://localhost/theme_dev/price-c"
+     				,"Sedan":					"http://localhost/theme_dev/price-b"
+     				,"Coupe":					"http://localhost/theme_dev/price-a"
+     				,"Compact Cars":			"http://localhost/theme_dev/price-a"
+     				,"Convertible":				"http://localhost/theme_dev/price-a"			
+     				,"Minivan":					"http://localhost/theme_dev/price-c"
+     				,"Cargo Vans":				"http://localhost/theme_dev/price-c"
+     				,"Van":						"http://localhost/theme_dev/price-d"
+     				,"Crossover":				"http://localhost/theme_dev/price-c"
+     				,"Hatchback":				"http://localhost/theme_dev/price-a"
+     				,"Large Cars":				"http://localhost/theme_dev/price-b"
+     				,"Midsize Cars":			"http://localhost/theme_dev/price-b"
+     				,"Midsize Station Wagons":	"http://localhost/theme_dev/price-c"
+     				,"Mini Compact Cars":		"http://localhost/theme_dev/price-a"
+     				,"Panel Van":				"http://localhost/theme_dev/price-d"
+     				,"Passenger Vans":			"http://localhost/theme_dev/price-d"
+     				,"Roadster":				"http://localhost/theme_dev/price-a"
+     				,"Small Pickup Trucks":		"http://localhost/theme_dev/price-a"
+     				,"Small Station Wagons":	"http://localhost/theme_dev/price-c"
+				}
+
+
+     			if (body == select) {
+     				window.location.href = select[body];
+     			} else {
 	     				$('#cq-need-more').show(500);
 	     				$('#cq-body').change(function() {
 	     				var body = $(this).val();
 	     				console.log(body);
-	     					if (body == "Pickup") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "SUV") {
-			     				window.location.href = "http://localhost/theme_dev/price-b" ;
-			     			}
-			     			else if (body == "Sedan") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Coupe") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Compact Cars") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Convertible") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Minivan") {
-			     				window.location.href = "http://localhost/theme_dev/price-c" ;
-			     			}
-			     			else if (body == "Cargo Vans") {
-			     				window.location.href = "http://localhost/theme_dev/price-c" ;
-			     			}
-			     			else if (body == "Van") {
-			     				window.location.href = "http://localhost/theme_dev/price-c" ;
-			     			}
-			     			else if (body == "Crossover") {
-			     				window.location.href = "http://localhost/theme_dev/price-b" ;
-			     			}
-			     			else if (body == "Hatchback") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Large Cars") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Midsize Cars") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Midsize Station Wagons") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Mini Compact Cars") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Panel Van") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Passenger Vans") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Roadster") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Small Pickup Trucks") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
-			     			}
-			     			else if (body == "Small Station Wagons") {
-			     				window.location.href = "http://localhost/theme_dev/price-a" ;
+	     					if (body == select) {
+			     				window.location.href = select[body];
 			     			} else {
 			     				window.location.href = "http://localhost/theme_dev/price-general";
 			     			}
