@@ -176,52 +176,67 @@ static function cq_quote() {
 	 $('#cq-search-btn').click( function(){ carquery.search(); } );
 	});
 
-//Function for grabbing body style and navigating to corect page.
+//I'm wrapping the code in a function closure to keep it out of the global namespace. That way its variables can't interfere or be interfered with by other js scripts.
+(function($) {
+    //instead of repeating the href over and over again in the "select" object, we pull it dynamically from the global javascript object ("window")
+    var root = window.location.origin + "/theme_dev/";
+    var select = {
+        "Pickup": "price-a",
+        "SUV": "price-c",
+        "Sedan": "price-b",
+        "Coupe": "price-a",
+        "Compact Cars": "price-a",
+        "Convertible": "price-a",
+        "Minivan": "price-c",
+        "Cargo Vans": "price-c",
+        "Van": "price-d",
+        "Crossover": "price-c",
+        "Hatchback": "price-a",
+        "Large Cars": "price-b",
+        "Midsize Cars": "price-b",
+        "Midsize Station Wagons": "price-c",
+        "Mini Compact Cars": "price-a",
+        "Panel Van": "price-d",
+        "Passenger Vans": "price-d",
+        "Roadster": "price-a",
+        "Small Pickup Trucks": "price-a",
+        "Small Station Wagons": "price-c"
+    };
 
-     	$('#cq-show-data').click(
-     	function bodyStyle(){
-     			var body = $("td:contains('Body Style:')").next().text();
-     			console.log(body);
-     			var select = {
-     				 "Pickup": 					"http://localhost/theme_dev/price-a"
-     				,"SUV":						"http://localhost/theme_dev/price-c"
-     				,"Sedan":					"http://localhost/theme_dev/price-b"
-     				,"Coupe":					"http://localhost/theme_dev/price-a"
-     				,"Compact Cars":			"http://localhost/theme_dev/price-a"
-     				,"Convertible":				"http://localhost/theme_dev/price-a"			
-     				,"Minivan":					"http://localhost/theme_dev/price-c"
-     				,"Cargo Vans":				"http://localhost/theme_dev/price-c"
-     				,"Van":						"http://localhost/theme_dev/price-d"
-     				,"Crossover":				"http://localhost/theme_dev/price-c"
-     				,"Hatchback":				"http://localhost/theme_dev/price-a"
-     				,"Large Cars":				"http://localhost/theme_dev/price-b"
-     				,"Midsize Cars":			"http://localhost/theme_dev/price-b"
-     				,"Midsize Station Wagons":	"http://localhost/theme_dev/price-c"
-     				,"Mini Compact Cars":		"http://localhost/theme_dev/price-a"
-     				,"Panel Van":				"http://localhost/theme_dev/price-d"
-     				,"Passenger Vans":			"http://localhost/theme_dev/price-d"
-     				,"Roadster":				"http://localhost/theme_dev/price-a"
-     				,"Small Pickup Trucks":		"http://localhost/theme_dev/price-a"
-     				,"Small Station Wagons":	"http://localhost/theme_dev/price-c"
-				}
+    //let's make a helper function to set the href to avoid repeat code
+    function setWindowLocation(path) {
+        window.location.href = root + path;
+    }
 
 
-     			if (body == select) {
-     				window.location.href = select[body];
-     			} else {
-	     				$('#cq-need-more').show(500);
-	     				$('#cq-body').change(function() {
-	     				var body = $(this).val();
-	     				console.log(body);
-	     					if (body == select) {
-			     				window.location.href = select[body];
-			     			} else {
-			     				window.location.href = "http://localhost/theme_dev/price-general";
-			     			}
-	     					
-	     				});
-     				}     				
-     	});
+     
+    $('#cq-show-data').click(function (){
+        //use of the selector here is going to be very slow. Can't you just create an id for the "td" object with the body text and grab it that way?
+        var body = $("td:contains('Body Style:')").next().text();
+        console.log(body);
+                           
+        //Here I'm using the "in" operator to determine whether or not the key "body" exists in the object "select"
+        //the equality operator "==" will only check whether or not "body" has the same elements as  "select"                    
+        if (body in select) {
+            setWindowLocation(select[body]);
+        } else {
+            $('#cq-need-more').show(500);
+            
+            $('#cq-body').change(function() {
+                var body = $(this).val();
+                console.log(body);
+                
+                if (body in select) {
+                    setWindowLocation(select[body]);
+                } else {
+                    setWindowLocation("price-general");
+                }
+
+            });
+        }
+                                                   
+    });
+})(jQuery);
 
 	</script>
 	    <?php
