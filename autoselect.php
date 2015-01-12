@@ -2,7 +2,7 @@
 /*
 Plugin Name: Auto Selector
 Plugin URI: http://taglinegroup.com
-Description: Based on Car Query API, user selects car year, make, model, and trim to be direceted to a page based on criteria. 
+Description: Add short code [cq-quote] to the page you want the app to appear. Create different pricing pages and add the slug to a corresponding bodystyle in the plugin admin page (Settings/ Tint Quote). User selects car year, make, model, and trim to be direceted to a page based on criteria, Built on Car Query API. 
 Author: Tharon Carrlson
 
 Car Query API Doc
@@ -31,6 +31,17 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+add_action('wp_enqueue_scripts', 'as_styles'); // Add Theme Stylesheet
+add_action('wp_enqueue_scripts', 'as_scripts'); // Add Theme Stylesheet
+
+function as_styles() {
+    wp_register_style('autoselect-css', plugins_url('/css/autoselect.css', __FILE__ ), array(), '1.0', 'all');
+    wp_enqueue_style('autoselect-css'); // Enqueue it!
+}
+
+function as_scripts() {
+    wp_enqueue_script('cookie-js', plugins_url('/js/lib/jquery.cookie.js', __FILE__ ), array('jquery'), '1.0', true); // Enqueue it!
+}
 
 add_action( 'admin_menu', 'my_admin_menu' );
 function my_admin_menu() {
@@ -283,7 +294,7 @@ Class CarQueryAPI{
 
 		//Register ShortCode
 		add_shortcode("cq-quote", 	array(__CLASS__, 'cq_quote' )); 
-		
+		 
 		//Load javascript in wp_footer
 		
 		add_action('init', 		array(__CLASS__, 'register_script' ));
@@ -295,20 +306,22 @@ static function cq_quote() {
 
 		//Trigger javascript scripts to load
 		self::$add_script = true;
-
-	 	return '<select class="sel-1" name="cq-year" id="cq-year"></select>
+    $_SESSION['year'] = '1977';
+	 	return  '
+        <select class="sel-1" name="cq-year" id="cq-year"></select>
 	 			<select class="sel-1" name="cq-make" id="cq-make"></select>
 	 			<select class="sel-1" name="cq-model" id="cq-model"></select>
 	 			<select class="sel-1" name="cq-trim" id="cq-trim"></select>
 	 			<input class="btn-1 button" id="cq-show-data" type="button" value="Get Quote"/>
 				<div id="car-model-data"> </div>
 				<div id="cq-need-more">
-				<span class="title-2">Please select the option below that best describes your vehicle</span> 
+				<span class="title-3">Please select the option below that best describes your vehicle</span> 
 				<select class="sel-1" name="cq-model" id="cq-body"></select>
 				</div>
-	 	';}
+	 	'
+   ;}
 
-	
+
 
 
 	//Include necessary javascript files
@@ -384,31 +397,7 @@ static function cq_quote() {
 	 var searchArgs =
 	 ({
          body_id:                       "cq-body"
-        ,default_search_text:           "Keyword Search"
-        ,doors_id:                      "cq-doors"
-        ,drive_id:                      "cq-drive"
-        ,engine_position_id:            "cq-engine-position"
-        ,engine_type_id:                "cq-engine-type"
-        ,fuel_type_id:                  "cq-fuel-type"
-        ,min_cylinders_id:              "cq-min-cylinders"
-        ,min_mpg_hwy_id:                "cq-min-mpg-hwy"
-        ,min_power_id:                  "cq-min-power"
-        ,min_top_speed_id:              "cq-min-top-speed"
-        ,min_torque_id:                 "cq-min-torque"
-        ,min_weight_id:                 "cq-min-weight"
-        ,min_year_id:                   "cq-min-year"
-        ,max_cylinders_id:              "cq-max-cylinders"
-        ,max_mpg_hwy_id:                "cq-max-mpg-hwy"
-        ,max_power_id:                  "cq-max-power"
-        ,max_top_speed_id:              "cq-max-top-speed"
-        ,max_weight_id:                 "cq-max-weight"
-        ,max_year_id:                   "cq-max-year"
-        ,search_controls_id:            "cq-search-controls"
-        ,search_input_id:               "cq-search-input"
-        ,search_results_id:             "cq-search-results"
-        ,search_result_id:              "cq-search-result"
-        ,seats_id:                      "cq-seats"
-        ,sold_in_us_id:                 "cq-sold-in-us"
+      
      }); 
 	 
      carquery.initSearchInterface(searchArgs);
@@ -461,21 +450,35 @@ Redirects user to related page based on the body style of the car they select
     $('#cq-show-data').click(function (){
         //use of the selector here is going to be very slow. Need a way to call just the body style into a div with id.
         var body = $("td:contains('Body Style:')").next().text();
+        var make = $('#cq-make').val();
+        var model = $('#cq-model').val();
         console.log(body);
-                           
+        console.log(make);
+         $.removeCookie('style', { path: '/' });  
+         $.removeCookie('make', { path: '/' }); 
+         $.removeCookie('model', { path: '/' });          
         //Here I'm using the "in" operator to determine whether or not the key "body" exists in the object "select"
         //the equality operator "==" will only check whether or not "body" has the same elements as  "select"                    
         if (body in select) {
+          $.cookie('make', make, { expires: 7, path: '/' });
+          $.cookie('model', model, { expires: 7, path: '/' });
             setWindowLocation(select[body]);
+             jQuery(document).ready(function($) {
+                 
+    });
         } else {
             $('#cq-need-more').show(500);
             
             $('#cq-body').change(function() {
                 var body = $(this).val();
-                console.log(body);
-                
+                console.log(make);
+                 
                 if (body in select) {
-                    setWindowLocation(select[body]);
+                  $.cookie('make', make, { expires: 7, path: '/' });
+                  $.cookie('model', model, { expires: 7, path: '/' });
+
+                  setWindowLocation(select[body]);
+
                 } else {
                     setWindowLocation("price-general");
                 }
