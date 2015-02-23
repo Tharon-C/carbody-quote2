@@ -71,34 +71,36 @@ function my_admin_init() {
     register_setting( 'my-settings-group', 'roadster' );
     register_setting( 'my-settings-group', 'small-pickup-trucks' );
     register_setting( 'my-settings-group', 'small-station-wagons' );
+    register_setting( 'my-settings-group', 'cq-default' );
     
     add_settings_field( 'field-one', 'Pickup', 'field_one_callback', 'tint-quote', 'section-one' );
     add_settings_field( 'field-two', 'SUV', 'field_two_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-three', 'sedan', 'field_three_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-four', 'coupe', 'field_four_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-five', 'compact-cars', 'field_five_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-six', 'convertible', 'field_six_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-seven', 'minivan', 'field_seven_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-eight', 'cargo-vans', 'field_eight_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-nine', 'crossover', 'field_nine_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-ten', 'hatchback', 'field_ten_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-eleven', 'large-cars', 'field_eleven_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-twelve', 'midsize-cars', 'field_twelve_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-thirteen', 'midsize-station-wagons', 'field_thirteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-fourteen', 'mini-compact-cars', 'field_fourteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-fifteen', 'panel-van', 'field_fifteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-sixteen', 'passenger-vans', 'field_sixteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-seventeen', 'roadster', 'field_seventeen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-eighteen', 'small-pickup-trucks', 'field_eighteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-nineteen', 'small-station-wagons', 'field_nineteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-twenty', 'van', 'field_twenty_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-three', 'Sedan', 'field_three_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-four', 'Coupe', 'field_four_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-five', 'Compact Cars', 'field_five_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-six', 'Convertible', 'field_six_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-seven', 'Minivan', 'field_seven_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-eight', 'Cargo Vans', 'field_eight_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-nine', 'Crossover', 'field_nine_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-ten', 'Hatchback', 'field_ten_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-eleven', 'Large Cars', 'field_eleven_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-twelve', 'Midsize Cars', 'field_twelve_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-thirteen', 'Midsize Station Wagons', 'field_thirteen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-fourteen', 'Mini Compact Cars', 'field_fourteen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-fifteen', 'panel Van', 'field_fifteen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-sixteen', 'Passenger Vans', 'field_sixteen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-seventeen', 'Roadster', 'field_seventeen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-eighteen', 'Small Pickup Trucks', 'field_eighteen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-nineteen', 'Small Station Wagons', 'field_nineteen_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-twenty', 'Van', 'field_twenty_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-twentyone', 'Default', 'field_twentyone_callback', 'tint-quote', 'section-one' );
 }
 
 
 
 // Instructions to user
 function section_one_callback() {
-    echo '<p>For each body style below, add the page slug you would like the user to be directed to.</p>
+    echo '<p>Create a page you would like your car selection form on and add the short code [cq-quote]. <br>Then create a result page that fits your pricing for each body style and add the code [cq-result]. <br>For each body style below, add the page slug you would like the user to be directed to.</p>
           <b>Example: your-page-slug</b>';
 }
 
@@ -182,6 +184,10 @@ function field_nineteen_callback() {
 function field_twenty_callback() {
     $setting = esc_attr( get_option( 'van' ) );
     echo "<input type='text' name='van' value='$setting' />";
+}
+function field_twentyone_callback() {
+    $setting = esc_attr( get_option( 'cq-default' ) );
+    echo "<input type='text' name='cq-default' value='$setting' />";
 }
 
 //Admin Page Layout
@@ -280,11 +286,15 @@ function van() {
   $select = get_option( 'van' );
   return $select;
 }
+function cq_default() {
+  $select = get_option( 'cq-default' );
+  return $select;
+}
 
-/*====================================================================
-Car Querry JSON API
-will populate select input options and get related bodystyle for redirect
-======================================================================= */
+/*=======================================================================================
+Car Querry JSON APIwill populate select input options 
+and return list of specification for the car selected
+========================================================================================== */
 
 Class CarQueryAPI{
 
@@ -326,9 +336,7 @@ static function cq_quote() {
 
 	//Include necessary javascript files
 	static function register_script() {
-
 		wp_register_script('carquery-api-js', 'http://www.carqueryapi.com/js/carquery.0.3.4.js', array('jquery'), '0.3.4', true);
-
 	}
 
 
@@ -445,8 +453,6 @@ Redirects user to related page based on the body style of the car they select
         window.location.href = root + path;
     }
 
-
-     
     $('#cq-show-data').click(function (){
         //use of the selector here is going to be very slow. Need a way to call just the body style into a div with id.
         var body = $("td:contains('Body Style:')").next().text();
@@ -480,7 +486,7 @@ Redirects user to related page based on the body style of the car they select
                   setWindowLocation(select[body]);
 
                 } else {
-                    setWindowLocation("price-general");
+                    setWindowLocation("<?php echo cq_default(); ?>");
                 }
 
             });
@@ -493,6 +499,28 @@ Redirects user to related page based on the body style of the car they select
 	    <?php
 	}
 }
+
+
+/*===============================================================
+Shortcode for result pages, 
+=================================================================*/
+
+//Register ShortCode [cq-result]
+add_shortcode('cq-result', 'cq_result' ); 
+     
+function cq_result($atts) {
+return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
+<script>
+    jQuery(document).ready(function($) {
+          var make = $.cookie('make');
+          var model = $.cookie('model');
+          console.log('style'); 
+          $('.selected-name').append(make + ', ' + model);  
+    });
+</script>";
+}
+
+
 //Initilazed the object
 CarQueryAPI::init();
 
