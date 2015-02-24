@@ -396,7 +396,7 @@ static function cq_quote() {
      
 	 carquery.year_select_min=1947;
      
-	 carquery.year_select_max=2013;
+	 carquery.year_select_max=2015;
  
      //Optional: initialize search interface elements.
      //The IDs provided below are the IDs of the text and select inputs that will be used to set the search criteria.
@@ -456,25 +456,29 @@ Redirects user to related page based on the body style of the car they select
     $('#cq-show-data').click(function (){
         //use of the selector here is going to be very slow. Need a way to call just the body style into a div with id.
         var body = $("td:contains('Body Style:')").next().text();
+         var doors = $("td:contains('Doors:')").next().text();
         var make = $('#cq-make').val();
         var model = $('#cq-model').val();
         console.log(body);
+        console.log(doors);
         console.log(make);
          $.removeCookie('style', { path: '/' });  
          $.removeCookie('make', { path: '/' }); 
          $.removeCookie('model', { path: '/' });          
         //Here I'm using the "in" operator to determine whether or not the key "body" exists in the object "select"
         //the equality operator "==" will only check whether or not "body" has the same elements as  "select"                    
-        if (body in select) {
+        if (body in select && body !== 'Pickup') {
           $.cookie('make', make, { expires: 7, path: '/' });
           $.cookie('model', model, { expires: 7, path: '/' });
             setWindowLocation(select[body]);
-             jQuery(document).ready(function($) {
-                 
-    });
-        } else {
+            console.log(body);
+        } 
+        else {
+            if (doors > 2) {
+              console.log(doors);
+            } else {
             $('#cq-need-more').show(500);
-            
+          
             $('#cq-body').change(function() {
                 var body = $(this).val();
                 console.log(make);
@@ -490,8 +494,9 @@ Redirects user to related page based on the body style of the car they select
                 }
 
             });
+          } 
         }
-                                                   
+                                                 
     });
 })(jQuery);
 
@@ -515,7 +520,9 @@ return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
           var make = $.cookie('make');
           var model = $.cookie('model');
           console.log('style'); 
-          $('.selected-name').append(make + ', ' + model);  
+          if (make !== 'undefined' && make !== '') {
+            $('.selected-name').append(make + ', ' + model); 
+          }
     });
 </script>";
 }
