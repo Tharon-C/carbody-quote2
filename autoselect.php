@@ -520,9 +520,9 @@ return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
           var make = $.cookie('make');
           var model = $.cookie('model');
           console.log('style'); 
-          if (make !== 'undefined' && make !== '') {
+          if (make !== 'undefined' && make !== '' && make !== 'null' ) {
             $('.selected-name').append(make + ', ' + model); 
-          }
+          } else { $('.selected-name').append('Your Selection'); }
     });
 </script>";
 }
