@@ -324,7 +324,7 @@ static function cq_quote() {
  	<select class="sel-1" name="cq-make" id="cq-make"></select>
  	<label>Model</label>
  	<select class="sel-1" name="cq-model" id="cq-model"></select>
- 	<label>trim</label>
+ 	<label>Trim</label>
  	<select class="sel-1" name="cq-trim" id="cq-trim"></select>
  	<input class="btn-1 button" id="cq-show-data" type="button" value="Get Quote"/>
 	<div id="car-model-data"> </div>
