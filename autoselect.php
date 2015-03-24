@@ -319,8 +319,8 @@ static function cq_quote() {
     $_SESSION['year'] = '1977';
 	 	return  '
 	<label>Year</label>
-        <select class="sel-1" name="cq-year" id="cq-year"></select>
-        <label>Make</label>
+  <select class="sel-1" name="cq-year" id="cq-year"></select>
+  <label>Make</label>
  	<select class="sel-1" name="cq-make" id="cq-make"></select>
  	<label>Model</label>
  	<select class="sel-1" name="cq-model" id="cq-model"></select>
@@ -432,6 +432,8 @@ Redirects user to related page based on the body style of the car they select
     var select = {
         "Pickup": "<?php echo pickup(); ?>",
         "SUV": "<?php echo suv(); ?>",
+        "Sport Utility Vehicles" :  "<?php echo suv(); ?>",
+        "Sport Utility Vehicle" :  "<?php echo suv(); ?>",
         "Sedan": "<?php echo sedan(); ?>",
         "Coupe": "<?php echo coupe(); ?>",
         "Compact Cars": "<?php echo compact_cars(); ?>",
@@ -476,31 +478,20 @@ Redirects user to related page based on the body style of the car they select
           $.cookie('model', model, { expires: 7, path: '/' });
             setWindowLocation(select[body]);
             console.log(body);
-        } 
-        else {
-            if (doors > 2) {
-              console.log(doors);
-            } else {
+        } else {
             $('#cq-need-more').show(500);
-          
-            $('#cq-body').change(function() {
-                var body = $(this).val();
-                console.log(make);
-                 
-                if (body in select) {
-                  $.cookie('make', make, { expires: 7, path: '/' });
-                  $.cookie('model', model, { expires: 7, path: '/' });
-
-                  setWindowLocation(select[body]);
-
-                } else {
-                    setWindowLocation("<?php echo cq_default(); ?>");
-                }
-
-            });
-          } 
-        }
-                                                 
+          }
+        $('#cq-body').change(function() {
+            var body = $(this).val();
+            console.log(make);
+            if (body in select) {
+              $.cookie('make', make, { expires: 7, path: '/' });
+              $.cookie('model', model, { expires: 7, path: '/' });
+              setWindowLocation(select[body]); }
+              else {
+                setWindowLocation("<?php echo cq_default(); ?>");
+            }
+        });                                          
     });
 })(jQuery);
 
