@@ -11,6 +11,8 @@ add_action('wp_enqueue_scripts', 'as_scripts'); // Add Theme Stylesheet
 function as_styles() {
     wp_register_style('autoselect-css', plugins_url('/css/autoselect.css', __FILE__ ), array(), '1.0', 'all');
     wp_enqueue_style('autoselect-css'); // Enqueue it!
+    wp_register_style('angular-busy-css', plugins_url('/bower_components/angular-busy/dist/angular-busy.min.css', __FILE__ ), array(), '1.0', 'all');
+    wp_enqueue_style('angular-busy-css'); // Enqueue it!
     wp_register_style('bootstrap-css', 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css', array(), '1.0', 'all');
     wp_enqueue_style('bootstrap-css'); // Enqueue it!
 }
@@ -18,10 +20,12 @@ function as_styles() {
 function as_scripts() {
     wp_enqueue_script('bootstrap-js', 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js', array(), '1.0', true); // Enqueue it!
     wp_enqueue_script('cookie-js', plugins_url('/js/lib/jquery.cookie.js', __FILE__ ), array('jquery'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('angular-js', plugins_url('/bower_components/angular/angular.min.js', __FILE__ ), array('jquery' , 'bootstrap-js'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('angular-animate', plugins_url('/bower_components/angular-animate/angular-animate.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('angular-busy', plugins_url('/bower_components/angular-busy/dist/angular-busy.min.js', __FILE__ ), array('angular-js', 'angular-animate'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('angular-js', plugins_url('/bower_components/angular/angular.min.js', __FILE__ ), array('jquery' , 'bootstrap-js'), '1.0', true);
     wp_enqueue_script('ui-angular-js', plugins_url('/bower_components/angular-ui-utils/ui-utils.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
     wp_enqueue_script('sanitize-angular-js', 'http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular-sanitize.js', array('angular-js'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('edmunds-api-js', plugins_url('/js/main.js', __FILE__ ), array('angular-js','ui-angular-js', 'sanitize-angular-js'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('edmunds-api-js', plugins_url('/js/main.js', __FILE__ ), array('angular-js','ui-angular-js', 'sanitize-angular-js', 'angular-animate', 'angular-busy'), '1.0', true); // Enqueue it!
 }
 
 add_action( 'admin_menu', 'my_admin_menu' );

@@ -1,5 +1,5 @@
 
-  var app = angular.module('app', ['ngSanitize', 'ui.utils', ]);
+  var app = angular.module('app', ['ngSanitize', 'ui.utils', 'ngAnimate', 'cgBusy' ]);
   app.controller('page', function($scope) {
     $scope.request = {};
     $scope.loadSectionData = function(section) {
@@ -15,7 +15,7 @@ app.controller('iq_lookup', function($scope) {
 app.controller('iq_make', function($scope) {
     $scope.loadData = function() {
       var request = {};
-      jQuery.ajax({
+     jQuery.ajax({
         url: "https://api.edmunds.com/api/vehicle/v2/makes",
         data: {
           'fmt': "json",
