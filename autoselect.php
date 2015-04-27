@@ -1,35 +1,9 @@
 <?php
 /*
-Plugin Name: Auto Selector
+Plugin Name: Car Body Quote
 Plugin URI: http://taglinegroup.com
-Description: Add short code [cq-quote] to the page you want the app to appear. Create different pricing pages and add the slug to a corresponding bodystyle in the plugin admin page (Settings/ Tint Quote). User selects car year, make, model, and trim to be direceted to a page based on criteria, Built on Car Query API. 
-Author: Tharon Carrlson
-
-Car Query API Doc
-Author URI: http://www.carqueryapi.com
-License: GPL2
-
-Plugin Name: Official CarQuery API Wordpress Plugin
-Plugin URI: http://www.carqueryapi.com/demo/wordpress-plugin/
-Description: The CarQuery API plugin easily creates dependent vehicle year, make, model, and trim dropdowns.
-Version: 1.1
-Author: CarQueryAPI
-Author URI: http://www.carqueryapi.com
-License: GPL2
-Copyright 2012 CarQueryAPI  (email : dan@carqueryapi.com)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License, version 2, as
-published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+Description: Add short code [tq-quote] to the page you want the app to appear. Create different pricing pages with short code [tq-result] at the top and add the slug to a corresponding bodystyle in the plugin admin page (Settings/ Tint Quote). User selects car year, make, model, and trim to be direceted to a page based on criteria, Built on Car Query API. 
+Author: Tharon Carlson
 */
 add_action('wp_enqueue_scripts', 'as_styles'); // Add Theme Stylesheet
 add_action('wp_enqueue_scripts', 'as_scripts'); // Add Theme Stylesheet
@@ -37,10 +11,17 @@ add_action('wp_enqueue_scripts', 'as_scripts'); // Add Theme Stylesheet
 function as_styles() {
     wp_register_style('autoselect-css', plugins_url('/css/autoselect.css', __FILE__ ), array(), '1.0', 'all');
     wp_enqueue_style('autoselect-css'); // Enqueue it!
+    wp_register_style('bootstrap-css', 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css', array(), '1.0', 'all');
+    wp_enqueue_style('bootstrap-css'); // Enqueue it!
 }
 
 function as_scripts() {
+    wp_enqueue_script('bootstrap-js', 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js', array(), '1.0', true); // Enqueue it!
     wp_enqueue_script('cookie-js', plugins_url('/js/lib/jquery.cookie.js', __FILE__ ), array('jquery'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('angular-js', plugins_url('/bower_components/angular/angular.min.js', __FILE__ ), array('jquery' , 'bootstrap-js'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('ui-angular-js', plugins_url('/bower_components/angular-ui-utils/ui-utils.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('sanitize-angular-js', 'http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular-sanitize.js', array('angular-js'), '1.0', true); // Enqueue it!
+    wp_enqueue_script('edmunds-api-js', plugins_url('/js/main.js', __FILE__ ), array('angular-js','ui-angular-js', 'sanitize-angular-js'), '1.0', true); // Enqueue it!
 }
 
 add_action( 'admin_menu', 'my_admin_menu' );
@@ -48,55 +29,42 @@ function my_admin_menu() {
     add_options_page( 'Car Tint Quote', 'Tint Quote', 'manage_options', 'tint-quote', 'my_options_page' );
 }
 
-add_action( 'admin_init', 'my_admin_init' );
-function my_admin_init() {
+add_action( 'admin_init', 'tq_admin_init' );
+function tq_admin_init() {
     add_settings_section( 'section-one', 'Body Styles', 'section_one_callback', 'tint-quote' );
-    register_setting( 'my-settings-group', 'pickup' );
     register_setting( 'my-settings-group', 'suv' );
-    register_setting( 'my-settings-group', 'sedan' );
     register_setting( 'my-settings-group', 'coupe' );
-    register_setting( 'my-settings-group', 'compact-cars' );
-    register_setting( 'my-settings-group', 'convertible' );
-    register_setting( 'my-settings-group', 'minivan' );
-    register_setting( 'my-settings-group', 'cargo-vans' );
-    register_setting( 'my-settings-group', 'van' );
-    register_setting( 'my-settings-group', 'crossover' );
+    register_setting( 'my-settings-group', 'sedan' );
     register_setting( 'my-settings-group', 'hatchback' );
-    register_setting( 'my-settings-group', 'large-cars' );
-    register_setting( 'my-settings-group', 'midsize-cars' );
-    register_setting( 'my-settings-group', 'midsize-station-wagons' );
-    register_setting( 'my-settings-group', 'mini-compact-cars' );
-    register_setting( 'my-settings-group', 'panel-van' );
-    register_setting( 'my-settings-group', 'passenger-vans' );
-    register_setting( 'my-settings-group', 'roadster' );
-    register_setting( 'my-settings-group', 'small-pickup-trucks' );
-    register_setting( 'my-settings-group', 'small-station-wagons' );
-    register_setting( 'my-settings-group', 'cq-default' );
-    
-    add_settings_field( 'field-one', 'Pickup', 'field_one_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-two', 'SUV', 'field_two_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-three', 'Sedan', 'field_three_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-four', 'Coupe', 'field_four_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-five', 'Compact Cars', 'field_five_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-six', 'Convertible', 'field_six_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-seven', 'Minivan', 'field_seven_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-eight', 'Cargo Vans', 'field_eight_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-nine', 'Crossover', 'field_nine_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-ten', 'Hatchback', 'field_ten_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-eleven', 'Large Cars', 'field_eleven_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-twelve', 'Midsize Cars', 'field_twelve_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-thirteen', 'Midsize Station Wagons', 'field_thirteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-fourteen', 'Mini Compact Cars', 'field_fourteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-fifteen', 'panel Van', 'field_fifteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-sixteen', 'Passenger Vans', 'field_sixteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-seventeen', 'Roadster', 'field_seventeen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-eighteen', 'Small Pickup Trucks', 'field_eighteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-nineteen', 'Small Station Wagons', 'field_nineteen_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-twenty', 'Van', 'field_twenty_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-twentyone', 'Default', 'field_twentyone_callback', 'tint-quote', 'section-one' );
+    register_setting( 'my-settings-group', 'convertible' );
+    register_setting( 'my-settings-group', 'wagon' );
+    register_setting( 'my-settings-group', 'sport-wagon' );
+    register_setting( 'my-settings-group', 'pickup' );
+    register_setting( 'my-settings-group', 'crew-cab' );
+    register_setting( 'my-settings-group', 'extended-cab' );
+    register_setting( 'my-settings-group', 'regular-cab' );
+    register_setting( 'my-settings-group', 'supercab' );
+    register_setting( 'my-settings-group', 'double-cab' );
+    register_setting( 'my-settings-group', 'van' );
+    register_setting( 'my-settings-group', 'minivan' );
+    register_setting( 'my-settings-group', 'tq-default' );
+    add_settings_field( 'field-suv', 'SUV', 'field_suv_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-coupe', 'Coupe', 'field_coupe_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-sedan', 'Sedan', 'field_sedan_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-hatchback', 'Hatchback', 'field_hatchback_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-convertible', 'Convertible', 'field_convertible_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-tsx-sport-wagon', 'Sport Wagon', 'field_sport_wagon_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-wagon', 'Wagon', 'field_wagon_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-pickup', 'Pickup', 'field_pickup_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-crew-cab', 'Crew Cab', 'field_crew_cab_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-extended-cab', 'Extended Cab', 'field_extended_cab_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-regular-cab', 'Regular Cab', 'field_regular_cab_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-supercab', 'SuperCab', 'field_supercab_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-double-cab', 'Double Cab', 'field_double_cab_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-van', 'Van', 'field_van_callback', 'tint-quote', 'section-one' );
+    add_settings_field( 'field-minivan', 'Minivan', 'field_minivan_callback', 'tint-quote', 'section-one' );  
+    add_settings_field( 'field-tq-default', 'Default', 'field_tq_default_callback', 'tint-quote', 'section-one' );
 }
-
-
 
 // Instructions to user
 function section_one_callback() {
@@ -105,90 +73,86 @@ function section_one_callback() {
 }
 
 // Fields For Admin Page
-function field_one_callback() {
-    $setting = esc_attr( get_option( 'pickup' ) );
-    echo "<input type='text' name='pickup' value='$setting' />";
-}
-function field_two_callback() {
+function field_suv_callback() {
     $setting = esc_attr( get_option( 'suv' ) );
     echo "<input type='text' name='suv' value='$setting' />";
 }
-function field_three_callback() {
-    $setting = esc_attr( get_option( 'sedan' ) );
-    echo "<input type='text' name='sedan' value='$setting' />";
-}
-function field_four_callback() {
+function field_coupe_callback() {
     $setting = esc_attr( get_option( 'coupe' ) );
     echo "<input type='text' name='coupe' value='$setting' />";
 }
-function field_five_callback() {
-    $setting = esc_attr( get_option( 'compact-cars' ) );
-    echo "<input type='text' name='compact-cars' value='$setting' />";
+function field_sedan_callback() {
+    $setting = esc_attr( get_option( 'sedan' ) );
+    echo "<input type='text' name='sedan' value='$setting' />";
 }
-function field_six_callback() {
-    $setting = esc_attr( get_option( 'convertible' ) );
-    echo "<input type='text' name='convertible' value='$setting' />";
-}
-function field_seven_callback() {
-    $setting = esc_attr( get_option( 'minivan' ) );
-    echo "<input type='text' name='minivan' value='$setting' />";
-}
-function field_eight_callback() {
-    $setting = esc_attr( get_option( 'cargo-vans' ) );
-    echo "<input type='text' name='cargo-vans' value='$setting' />";
-}
-function field_nine_callback() {
-    $setting = esc_attr( get_option( 'crossover' ) );
-    echo "<input type='text' name='crossover' value='$setting' />";
-}
-function field_ten_callback() {
+function field_hatchback_callback() {
     $setting = esc_attr( get_option( 'hatchback' ) );
     echo "<input type='text' name='hatchback' value='$setting' />";
 }
-function field_eleven_callback() {
-    $setting = esc_attr( get_option( 'large-cars' ) );
-    echo "<input type='text' name='large-cars' value='$setting' />";
+function field_convertible_callback() {
+    $setting = esc_attr( get_option( 'convertible' ) );
+    echo "<input type='text' name='convertible' value='$setting' />";
 }
-function field_twelve_callback() {
-    $setting = esc_attr( get_option( 'midsize-cars' ) );
-    echo "<input type='text' name='midsize-cars' value='$setting' />";
+function field_sport_wagon_callback() {
+    $setting = esc_attr( get_option( 'sport-wagon' ) );
+    echo "<input type='text' name='sport-wagon' value='$setting' />";
 }
-function field_thirteen_callback() {
-    $setting = esc_attr( get_option( 'midsize-station-wagons' ) );
-    echo "<input type='text' name='midsize-station-wagons' value='$setting' />";
+
+function field_wagon_callback() {
+    $setting = esc_attr( get_option( 'wagon' ) );
+    echo "<input type='text' name='wagon' value='$setting' />";
 }
-function field_fourteen_callback() {
-    $setting = esc_attr( get_option( 'mini-compact-cars' ) );
-    echo "<input type='text' name='mini-compact-cars' value='$setting' />";
+
+function field_pickup_callback() {
+    $setting = esc_attr( get_option( 'pickup' ) );
+    echo "<input type='text' name='pickup' value='$setting' />";
 }
-function field_fifteen_callback() {
-    $setting = esc_attr( get_option( 'panel-van' ) );
-    echo "<input type='text' name='panel-van' value='$setting' />";
+
+function field_crew_cab_callback() {
+    $setting = esc_attr( get_option( 'crew-cab' ) );
+    echo "<input type='text' name='crew-cab' value='$setting' />";
 }
-function field_sixteen_callback() {
-    $setting = esc_attr( get_option( 'passenger-vans' ) );
-    echo "<input type='text' name='passenger-vans' value='$setting' />";
+
+function field_extended_cab_callback() {
+    $setting = esc_attr( get_option( 'extended-cab' ) );
+    echo "<input type='text' name='extended-cab' value='$setting' />";
 }
-function field_seventeen_callback() {
-    $setting = esc_attr( get_option( 'roadster' ) );
-    echo "<input type='text' name='roadster' value='$setting' />";
+
+function field_regular_cab_callback() {
+    $setting = esc_attr( get_option( 'regular-cab' ) );
+    echo "<input type='text' name='regular-cab' value='$setting' />";
 }
-function field_eighteen_callback() {
-    $setting = esc_attr( get_option( 'small-pickup-trucks' ) );
-    echo "<input type='text' name='small-pickup-trucks' value='$setting' />";
+
+function field_supercab_callback() {
+    $setting = esc_attr( get_option( 'supercab' ) );
+    echo "<input type='text' name='supercab' value='$setting' />";
 }
-function field_nineteen_callback() {
-    $setting = esc_attr( get_option( 'small-station-wagons' ) );
-    echo "<input type='text' name='small-station-wagons' value='$setting' />";
+
+function field_double_cab_callback() {
+    $setting = esc_attr( get_option( 'double-cab' ) );
+    echo "<input type='text' name='double-cab' value='$setting' />";
 }
-function field_twenty_callback() {
+
+function field_crewmax_cab_callback() {
+    $setting = esc_attr( get_option( 'crewmax-cab' ) );
+    echo "<input type='text' name='crewmax-cab' value='$setting' />";
+}
+
+function field_van_callback() {
     $setting = esc_attr( get_option( 'van' ) );
     echo "<input type='text' name='van' value='$setting' />";
 }
-function field_twentyone_callback() {
-    $setting = esc_attr( get_option( 'cq-default' ) );
-    echo "<input type='text' name='cq-default' value='$setting' />";
+
+
+function field_minivan_callback() {
+    $setting = esc_attr( get_option( 'minivan' ) );
+    echo "<input type='text' name='minivan' value='$setting' />";
 }
+function field_tq_default_callback() {
+    $setting = esc_attr( get_option( 'tq-default' ) );
+    echo "<input type='text' name='tq-default' value='$setting' />";
+}
+
 
 //Admin Page Layout
 function my_options_page() {
@@ -206,104 +170,84 @@ function my_options_page() {
 
 
 // Setting variables for application 
-function pickup() {
-  $select = get_option( 'pickup' );
-  return $select;
-}
 function suv() {
   $select = get_option( 'suv' );
-  return $select;
-}
-function sedan() {
-  $select = get_option( 'sedan' );
   return $select;
 }
 function coupe() {
   $select = get_option( 'coupe' );
   return $select;
 }
-function compact_cars() {
-  $select = get_option( 'compact-cars' );
-  return $select;
-}
-function convertible() {
-  $select = get_option( 'convertible' );
-  return $select;
-}
-function minivan() {
-  $select = get_option( 'minivan' );
-  return $select;
-}
-function cargo_vans() {
-  $select = get_option( 'cargo-vans' );
-  return $select;
-}
-function crossover() {
-  $select = get_option( 'crossover' );
+function sedan() {
+  $select = get_option( 'sedan' );
   return $select;
 }
 function hatchback() {
   $select = get_option( 'hatchback' );
   return $select;
 }
-function large_cars() {
-  $select = get_option( 'large-cars' );
+function convertible() {
+  $select = get_option( 'convertible' );
   return $select;
 }
-function midsize_cars() {
-  $select = get_option( 'midsize-cars' );
+function beetle_convertible() {
+  $select = get_option( 'beetle-convertible' );
   return $select;
 }
-function midsize_station_wagons() {
-  $select = get_option( 'midsize-station-wagons' );
+function sport_wagon() {
+  $select = get_option( 'sport-wagon' );
   return $select;
 }
-function mini_compact_cars() {
-  $select = get_option( 'mini-compact-cars' );
+function wagon() {
+  $select = get_option( 'wagon' );
   return $select;
 }
-function panel_van() {
-  $select = get_option( 'panel-van' );
+function crew_cab() {
+  $select = get_option( 'crew-cab' );
   return $select;
 }
-function passenger_vans() {
-  $select = get_option( 'passenger-vans' );
+function extended_cab() {
+  $select = get_option( 'extended-cab' );
   return $select;
 }
-function roadster() {
-  $select = get_option( 'roadster' );
+function regular_cab() {
+  $select = get_option( 'regular-cab' );
   return $select;
 }
-function small_pickup_trucks() {
-  $select = get_option( 'small-pickup-trucks' );
+function supercab() {
+  $select = get_option( 'supercab' );
   return $select;
 }
-function small_station_wagons() {
-  $select = get_option( 'small-station-wagons' );
+function double_cab() {
+  $select = get_option( 'double-cab' );
   return $select;
 }
 function van() {
   $select = get_option( 'van' );
   return $select;
 }
-function cq_default() {
-  $select = get_option( 'cq-default' );
+function minivan() {
+  $select = get_option( 'minivan' );
+  return $select;
+}
+function tq_default() {
+  $select = get_option( 'tq-default' );
   return $select;
 }
 
 /*=======================================================================================
-Car Querry JSON APIwill populate select input options 
+Edmunds JSON APIwill populate select input options 
 and return list of specification for the car selected
 ========================================================================================== */
 
-Class CarQueryAPI{
+Class edmundsAPI{
 
 	static $add_script;
 
 	static function init() {
 
 		//Register ShortCode
-		add_shortcode("cq-quote", 	array(__CLASS__, 'cq_quote' )); 
+		add_shortcode("tq-quote", 	array(__CLASS__, 'tq_quote' )); 
 		 
 		//Load javascript in wp_footer
 		
@@ -312,37 +256,16 @@ Class CarQueryAPI{
 		add_action('wp_footer', array(__CLASS__, 'print_script' ));
 	}
 	
-static function cq_quote() {
-
+static function tq_quote() {
 		//Trigger javascript scripts to load
 		self::$add_script = true;
-    $_SESSION['year'] = '1977';
-	 	return  '
-	<label>Year</label>
-  <select class="sel-1" name="cq-year" id="cq-year"></select>
-  <label>Make</label>
- 	<select class="sel-1" name="cq-make" id="cq-make"></select>
- 	<label>Model</label>
- 	<select class="sel-1" name="cq-model" id="cq-model"></select>
- 	<label>Trim</label>
- 	<select class="sel-1" name="cq-trim" id="cq-trim"></select>
- 	<input class="btn-1 button" id="cq-show-data" type="button" value="Get Quote"/>
-	<div id="car-model-data"> </div>
-	<div id="cq-need-more">
-	<span class="title-3">Please select the option below that best describes your vehicle</span> 
-	<select class="sel-1" name="cq-model" id="cq-body"></select>
-	</div>
-	 	'
+    include( plugin_dir_path( __FILE__ ) . 'dropdowns.php');
    ;}
-
-
-
 
 	//Include necessary javascript files
 	static function register_script() {
-		wp_register_script('carquery-api-js', 'http://www.carqueryapi.com/js/carquery.0.3.4.js', array('jquery'), '0.3.4', true);
+    
 	}
-
 
 	//check if the short codes were used, print js if required
 	static function print_script() {
@@ -351,75 +274,18 @@ static function cq_quote() {
 		if ( ! self::$add_script )
 			return;
 
-		wp_print_scripts('carquery-api-js');
+		wp_print_scripts('edmunds-api-js');
 
-		//initialize the carquery objects
-		self::carquery_init();
+		//initialize the edmunds objects
+		self::edmunds_init();
 	}
 
-
-	//Output required carquery javascript to footer.
-	static function carquery_init()
+	//Output required edmunds javascript to footer.
+	static function edmunds_init()
 	{
 		?>
 
 	<script type='text/javascript'>
-	
-	$(document).ready(
-	
-	function()
-	{
-		$('#cq-need-more').hide();
-     //Create a variable for the CarQuery object.  You can call it whatever you like.
-     var carquery = new CarQuery();
-
-     //Run the carquery init function to get things started:
-     
-	 carquery.init();
-     
-     //Optionally, you can pre-select a vehicle by passing year / make / model / trim to the init function:
-     //carquery.init('2000', 'dodge', 'Viper', 11636);
-
-     //Optional: Pass sold_in_us:true to the setFilters method to show only US models. 
-     
-	 carquery.setFilters( {sold_in_us:true} );
-	
-     //Optional: initialize the year, make, model, and trim drop downs by providing their element IDs
-    
-	carquery.initYearMakeModelTrim('cq-year', 'cq-make', 'cq-model', 'cq-trim');
-
-     //Optional: set the onclick event for a button to show car data.
-     
-	 $('#cq-trim').click(  function(){ carquery.populateCarData('car-model-data'); } );
-
-     //Optional: initialize the make, model, trim lists by providing their element IDs.
-     
-	 carquery.initMakeModelTrimList('make-list', 'model-list', 'trim-list', 'trim-data-list', 'body-list');
-	 
-     //Optional: set minimum and/or maximum year options.
-     
-	 carquery.year_select_min=1947;
-     
-	 carquery.year_select_max=2015;
- 
-     //Optional: initialize search interface elements.
-     //The IDs provided below are the IDs of the text and select inputs that will be used to set the search criteria.
-     //All values are optional, and will be set to the default values provided below if not specified.
-     
-	 var searchArgs =
-	 ({
-         body_id:                       "cq-body"
-      
-     }); 
-	 
-     carquery.initSearchInterface(searchArgs);
-
-     
-//If creating a search interface, set onclick event for the search button.  Make sure the ID used matches your search button ID.
-	 $('#cq-search-btn').click( function(){ carquery.search(); } );
-	});
-
-
 /*==============================================================================
 Logic for Redirecting User
 Redirects user to related page based on the body style of the car they select
@@ -430,68 +296,59 @@ Redirects user to related page based on the body style of the car they select
     //instead of repeating the href over and over again in the "select" object, we pull it dynamically from the global javascript object ("window")
     var root = "<?php echo home_url(); ?>/";
     var select = {
-        "Pickup": "<?php echo pickup(); ?>",
         "SUV": "<?php echo suv(); ?>",
-        "Sport Utility Vehicles" :  "<?php echo suv(); ?>",
-        "Sport Utility Vehicle" :  "<?php echo suv(); ?>",
-        "Sedan": "<?php echo sedan(); ?>",
         "Coupe": "<?php echo coupe(); ?>",
-        "Compact Cars": "<?php echo compact_cars(); ?>",
+        "Sedan" :  "<?php echo sedan(); ?>",
+        "Hatchback" :  "<?php echo hatchback(); ?>",
         "Convertible": "<?php echo convertible(); ?>",
-        "Minivan": "<?php echo minivan(); ?>",
-        "Cargo Vans": "<?php echo cargo_vans(); ?>",
+        "Continental GT Speed Convertible": "<?php echo convertible(); ?>",
+        "Beetle Convertible": "<?php echo convertible(); ?>",
+        "TSX Sport Wagon": "<?php echo sport_wagon(); ?>",
+        "CTS-V Coupe": "<?php echo coupe(); ?>",
+        "CTS Coupe": "<?php echo coupe(); ?>",
+        "CTS-V Wagon": "<?php echo wagon(); ?>",
+        "CTS Wagon": "<?php echo wagon(); ?>",
+        "Wagon": "<?php echo wagon(); ?>",
+        "Crew Cab": "<?php echo crew_cab(); ?>",
+        "Extended Cab": "<?php echo extended_cab(); ?>",
+        "Regular Cab": "<?php echo regular_cab(); ?>",
+        "SuperCab": "<?php echo supercab(); ?>",
+        "Double Cab": "<?php echo double_cab(); ?>",
+        "CrewMax Cab": "<?php echo extended_cab(); ?>",
+        "Quad Cab": "<?php echo supercab(); ?>",
+        "Club Cab": "p<?php echo extended_cab(); ?>",
         "Van": "<?php echo van(); ?>",
-        "Crossover": "<?php echo crossover(); ?>",
-        "Hatchback": "<?php echo hatchback(); ?>",
-        "Large Cars": "<?php echo large_cars(); ?>",
-        "Midsize Cars": "<?php echo midsize_cars(); ?>",
-        "Midsize Station Wagons": "<?php echo midsize_station_wagons(); ?>",
-        "Panel Van": "<?php echo panel_van(); ?>",
-        "Passenger Vans": "<?php echo passenger_vans(); ?>",
-        "Roadster": "<?php echo roadster(); ?>",
-        "Small Pickup Trucks": "p<?php echo small_pickup_trucks(); ?>",
-        "Small Station Wagons": "<?php echo small_station_wagons(); ?>",
-        "Mini Compact Cars": "<?php echo mini_compact_cars(); ?>"
+        "Ram Van": "<?php echo van(); ?>",
+        "Minivan": "<?php echo minivan(); ?>"
     };
 
     //Make a helper function to set the href to avoid repeat code
     function setWindowLocation(path) {
         window.location.href = root + path;
     }
-
-    $('#cq-show-data').click(function (){
+    console.log('body');
+    $('#get-quote').click(function (){
         //use of the selector here is going to be very slow. Need a way to call just the body style into a div with id.
-        var body = $("td:contains('Body Style:')").next().text();
+        var body = $('#iq-body').val();
          var doors = $("td:contains('Doors:')").next().text();
-        var make = $('#cq-make').val();
-        var model = $('#cq-model').val();
-        console.log(body);
-        console.log(doors);
+        var make = $('#iq-make').val();
+        var model = $('#iq-model').val();
+        
         console.log(make);
+        console.log(model);
          $.removeCookie('style', { path: '/' });  
          $.removeCookie('make', { path: '/' }); 
          $.removeCookie('model', { path: '/' });          
         //Here I'm using the "in" operator to determine whether or not the key "body" exists in the object "select"
         //the equality operator "==" will only check whether or not "body" has the same elements as  "select"                    
-        if (body in select && body !== 'Pickup') {
+        if (body in select && body) {
           $.cookie('make', make, { expires: 7, path: '/' });
           $.cookie('model', model, { expires: 7, path: '/' });
             setWindowLocation(select[body]);
             console.log(body);
         } else {
-            $('#cq-need-more').show(500);
-          }
-        $('#cq-body').change(function() {
-            var body = $(this).val();
-            console.log(make);
-            if (body in select) {
-              $.cookie('make', make, { expires: 7, path: '/' });
-              $.cookie('model', model, { expires: 7, path: '/' });
-              setWindowLocation(select[body]); }
-              else {
-                setWindowLocation("<?php echo cq_default(); ?>");
-            }
-        });                                          
+            setWindowLocation("<?php echo tq_default(); ?>");
+          }                                      
     });
 })(jQuery);
 
@@ -500,15 +357,14 @@ Redirects user to related page based on the body style of the car they select
 	}
 }
 
-
 /*===============================================================
 Shortcode for result pages, 
 =================================================================*/
 
-//Register ShortCode [cq-result]
-add_shortcode('cq-result', 'cq_result' ); 
+//Register ShortCode [tq-result]
+add_shortcode('tq-result', 'tq_result' ); 
      
-function cq_result($atts) {
+function tq_result($atts) {
 return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
 <script>
     jQuery(document).ready(function($) {
@@ -524,6 +380,6 @@ return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
 
 
 //Initilazed the object
-CarQueryAPI::init();
+edmundsAPI::init();
 
 ?>
