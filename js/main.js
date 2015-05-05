@@ -12,84 +12,85 @@ app.controller('iq_lookup', function($scope) {
   }
 });
 
-app.controller('iq_make', function($scope) {
+app.controller('iq_make', function($scope, $http) {
     $scope.loadData = function() {
       var request = {};
-     jQuery.ajax({
+     $scope.spinner = $http({
         url: "https://api.edmunds.com/api/vehicle/v2/makes",
-        data: {
+        method: 'GET',
+        params: {
           'fmt': "json",
           'api_key': "xj6qew748e36zyuagvwq3tff"
         },
-      }).done(function(result) {
+      }).success(function(result) {
         $scope.result = result;
-        $scope.$apply();
-      }).fail(function(err) {
-        throw err;
+       
+      }).error(function(data, status, headers, config) {
+        console.log(data);
       });
     }
   });
 
-app.controller('iq_model', function($scope) {
+app.controller('iq_model', function($scope, $http) {
     $scope.loadData = function() {
       var request = {
         make: angular.element('#MakeForm').scope().request.make,
       }
-      jQuery.ajax({
+      $scope.spinner = $http({
         url: "https://api.edmunds.com/" + "api/vehicle/v2/" + request.make,
-        data: {
+        method: 'GET',
+        params: {
           'fmt': "json",
           'api_key': "xj6qew748e36zyuagvwq3tff"
         },
-      }).done(function(result) {
+      }).success(function(result) {
         $scope.result = result;
-        $scope.$apply();
-      }).fail(function(err) {
-        throw err;
+      }).error(function(data, status, headers, config) {
+        console.log(data);
       });
     }
   });
 
-app.controller('iq_year', function($scope) {
+app.controller('iq_year', function($scope, $http) {
   $scope.loadData = function() {
     var request = {
       make: angular.element('#MakeForm').scope().request.make,
       model: angular.element('#ModelForm').scope().request.model,
     }
-    jQuery.ajax({
+     $scope.spinner = $http({
       url: "https://api.edmunds.com/" + "api/vehicle/v2/" + request.make + "/" + request.model,
-      data: {
-        'fmt': "json",
-        'api_key': "xj6qew748e36zyuagvwq3tff"
-      },
-    }).done(function(result) {
-      $scope.result = result;
-      $scope.$apply();
-    }).fail(function(err) {
-      throw err;
-    });
+      method: 'GET',
+        params: {
+          'fmt': "json",
+          'api_key': "xj6qew748e36zyuagvwq3tff"
+        },
+      }).success(function(result) {
+        $scope.result = result;
+      }).error(function(data, status, headers, config) {
+        console.log(data); 
+      });
   }
 });
 
-app.controller('iq_style', function($scope) {
+app.controller('iq_style', function($scope, $http) {
   $scope.loadData = function() {
     var request = {
       make: angular.element('#MakeForm').scope().request.make,
       model: angular.element('#ModelForm').scope().request.model,
       year: angular.element('#YearForm').scope().request.year,
     }
-    jQuery.ajax({
+    $scope.spinner = $http({
       url: "https://api.edmunds.com/" + "api/vehicle/v2/" + request.make + "/" + request.model + "/" + request.year,
-      data: {
-        'fmt': "json",
-        'api_key': "xj6qew748e36zyuagvwq3tff"
-      },
-    }).done(function(result) {
-      $scope.result = result;
-      $scope.$apply();
-    }).fail(function(err) {
-      throw err;
-    });
+      method: 'GET',
+        params: {
+          'fmt': "json",
+          'api_key': "xj6qew748e36zyuagvwq3tff"
+        },
+      }).success(function(result) {
+        $scope.result = result;
+      }).error(function(data, status, headers, config) {
+        console.log(data);
+      });
   }
 });
 

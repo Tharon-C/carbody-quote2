@@ -1,14 +1,14 @@
 <?php
 /*
-Plugin Name: Car Body Quote
+Plugin Name: Car Body Quote 2
 Plugin URI: http://taglinegroup.com
 Description: Add short code [tq-quote] to the page you want the app to appear. Create different pricing pages with short code [tq-result] at the top and add the slug to a corresponding bodystyle in the plugin admin page (Settings/ Tint Quote). User selects car year, make, model, and trim to be direceted to a page based on criteria, Built on Car Query API. 
 Author: Tharon Carlson
 */
-add_action('wp_enqueue_scripts', 'as_styles'); // Add Theme Stylesheet
-add_action('wp_enqueue_scripts', 'as_scripts'); // Add Theme Stylesheet
+add_action('wp_enqueue_scripts', 'pp_styles'); // Add Theme Stylesheet
+add_action('wp_enqueue_scripts', 'pp_scripts'); // Add Theme Stylesheet
 
-function as_styles() {
+function pp_styles() {
     wp_register_style('autoselect-css', plugins_url('/css/autoselect.css', __FILE__ ), array(), '1.0', 'all');
     wp_enqueue_style('autoselect-css'); // Enqueue it!
     wp_register_style('angular-busy-css', plugins_url('/bower_components/angular-busy/dist/angular-busy.min.css', __FILE__ ), array(), '1.0', 'all');
@@ -17,155 +17,145 @@ function as_styles() {
     wp_enqueue_style('bootstrap-css'); // Enqueue it!
 }
 
-function as_scripts() {
-    wp_enqueue_script('bootstrap-js', 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js', array(), '1.0', true); // Enqueue it!
-    wp_enqueue_script('cookie-js', plugins_url('/js/lib/jquery.cookie.js', __FILE__ ), array('jquery'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('angular-animate', plugins_url('/bower_components/angular-animate/angular-animate.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('angular-busy', plugins_url('/bower_components/angular-busy/dist/angular-busy.min.js', __FILE__ ), array('angular-js', 'angular-animate'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('angular-js', plugins_url('/bower_components/angular/angular.min.js', __FILE__ ), array('jquery' , 'bootstrap-js'), '1.0', true);
-    wp_enqueue_script('ui-angular-js', plugins_url('/bower_components/angular-ui-utils/ui-utils.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('sanitize-angular-js', 'http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular-sanitize.js', array('angular-js'), '1.0', true); // Enqueue it!
-    wp_enqueue_script('edmunds-api-js', plugins_url('/js/main.js', __FILE__ ), array('angular-js','ui-angular-js', 'sanitize-angular-js', 'angular-animate', 'angular-busy'), '1.0', true); // Enqueue it!
+function pp_scripts() {
+  wp_enqueue_script('bootstrap-js', 'http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js', array(), '1.0', true); // Enqueue it!
+  wp_enqueue_script('cookie-js', plugins_url('/js/lib/jquery.cookie.js', __FILE__ ), array('jquery'), '1.0', true); // Enqueue it!
+  wp_enqueue_script('angular-animate', plugins_url('/bower_components/angular-animate/angular-animate.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
+  wp_enqueue_script('angular-busy', plugins_url('/bower_components/angular-busy/dist/angular-busy.min.js', __FILE__ ), array('angular-js', 'angular-animate'), '1.0', true); // Enqueue it!
+  wp_enqueue_script('angular-js', plugins_url('/bower_components/angular/angular.min.js', __FILE__ ), array('jquery' , 'bootstrap-js'), '1.0', true);
+  wp_enqueue_script('ui-angular-js', plugins_url('/bower_components/angular-ui-utils/ui-utils.min.js', __FILE__ ), array('angular-js'), '1.0', true); // Enqueue it!
+  wp_enqueue_script('sanitize-angular-js', 'http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.14/angular-sanitize.js', array('angular-js'), '1.0', true); // Enqueue it!
+  wp_enqueue_script('edmunds-api-js', plugins_url('/js/main.js', __FILE__ ), array('angular-js','ui-angular-js', 'sanitize-angular-js', 'angular-animate', 'angular-busy'), '1.0', true); // Enqueue it!
 }
 
-add_action( 'admin_menu', 'my_admin_menu' );
-function my_admin_menu() {
-    add_options_page( 'Car Tint Quote', 'Tint Quote', 'manage_options', 'tint-quote', 'my_options_page' );
+add_action( 'admin_menu', 'pp_admin_menu' );
+function pp_admin_menu() {
+  add_options_page( 'Paint Protection Quote', 'Paint Protection Quote', 'manage_options', 'paint-quote', 'pp_options_page' );
 }
 
-add_action( 'admin_init', 'tq_admin_init' );
-function tq_admin_init() {
-    add_settings_section( 'section-one', 'Body Styles', 'section_one_callback', 'tint-quote' );
-    register_setting( 'my-settings-group', 'suv' );
-    register_setting( 'my-settings-group', 'coupe' );
-    register_setting( 'my-settings-group', 'sedan' );
-    register_setting( 'my-settings-group', 'hatchback' );
-    register_setting( 'my-settings-group', 'convertible' );
-    register_setting( 'my-settings-group', 'wagon' );
-    register_setting( 'my-settings-group', 'sport-wagon' );
-    register_setting( 'my-settings-group', 'pickup' );
-    register_setting( 'my-settings-group', 'crew-cab' );
-    register_setting( 'my-settings-group', 'extended-cab' );
-    register_setting( 'my-settings-group', 'regular-cab' );
-    register_setting( 'my-settings-group', 'supercab' );
-    register_setting( 'my-settings-group', 'double-cab' );
-    register_setting( 'my-settings-group', 'van' );
-    register_setting( 'my-settings-group', 'minivan' );
-    register_setting( 'my-settings-group', 'tq-default' );
-    add_settings_field( 'field-suv', 'SUV', 'field_suv_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-coupe', 'Coupe', 'field_coupe_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-sedan', 'Sedan', 'field_sedan_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-hatchback', 'Hatchback', 'field_hatchback_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-convertible', 'Convertible', 'field_convertible_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-tsx-sport-wagon', 'Sport Wagon', 'field_sport_wagon_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-wagon', 'Wagon', 'field_wagon_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-pickup', 'Pickup', 'field_pickup_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-crew-cab', 'Crew Cab', 'field_crew_cab_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-extended-cab', 'Extended Cab', 'field_extended_cab_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-regular-cab', 'Regular Cab', 'field_regular_cab_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-supercab', 'SuperCab', 'field_supercab_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-double-cab', 'Double Cab', 'field_double_cab_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-van', 'Van', 'field_van_callback', 'tint-quote', 'section-one' );
-    add_settings_field( 'field-minivan', 'Minivan', 'field_minivan_callback', 'tint-quote', 'section-one' );  
-    add_settings_field( 'field-tq-default', 'Default', 'field_tq_default_callback', 'tint-quote', 'section-one' );
+add_action( 'admin_init', 'pp_admin_init' );
+function pp_admin_init() {
+  add_settings_section( 'pp-section-one', 'Body Styles', 'pp_section_one_callback', 'paint-quote' );
+  register_setting( 'pp-settings-group', 'pp-suv' );
+  register_setting( 'pp-settings-group', 'pp-coupe' );
+  register_setting( 'pp-settings-group', 'pp-sedan' );
+  register_setting( 'pp-settings-group', 'pp-hatchback' );
+  register_setting( 'pp-settings-group', 'pp-convertible' );
+  register_setting( 'pp-settings-group', 'pp-wagon' );
+  register_setting( 'pp-settings-group', 'pp-sport-wagon' );
+  register_setting( 'pp-settings-group', 'pp-pickup' );
+  register_setting( 'pp-settings-group', 'pp-crew-cab' );
+  register_setting( 'pp-settings-group', 'pp-extended-cab' );
+  register_setting( 'pp-settings-group', 'pp-regular-cab' );
+  register_setting( 'pp-settings-group', 'pp-supercab' );
+  register_setting( 'pp-settings-group', 'pp-double-cab' );
+  register_setting( 'pp-settings-group', 'pp-van' );
+  register_setting( 'pp-settings-group', 'pp-minivan' );
+  register_setting( 'pp-settings-group', 'pp-default' );
+  add_settings_field( 'field-pp-suv', 'SUV', 'pp_field_suv_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-coupe', 'Coupe', 'pp_field_coupe_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-sedan', 'Sedan', 'pp_field_sedan_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-hatchback', 'Hatchback', 'pp_field_hatchback_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-convertible', 'Convertible', 'pp_field_convertible_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-tsx-sport-wagon', 'Sport Wagon', 'pp_field_sport_wagon_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-wagon', 'Wagon', 'pp_field_wagon_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-pickup', 'Pickup', 'pp_field_pickup_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-crew-cab', 'Crew Cab', 'pp_field_crew_cab_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-extended-cab', 'Extended Cab', 'pp_field_extended_cab_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-regular-cab', 'Regular Cab', 'pp_field_regular_cab_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-supercab', 'SuperCab', 'pp_field_supercab_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-double-cab', 'Double Cab', 'pp_field_double_cab_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-van', 'Van', 'pp_field_van_callback', 'paint-quote', 'pp-section-one' );
+  add_settings_field( 'field-pp-minivan', 'Minivan', 'pp_field_minivan_callback', 'paint-quote', 'pp-section-one' );  
+  add_settings_field( 'field-pp-default', 'Default', 'pp_field_tq_default_callback', 'paint-quote', 'pp-section-one' );
 }
 
 // Instructions to user
-function section_one_callback() {
-    echo '<p>Create a page you would like your car selection form on and add the short code [cq-quote]. <br>Then create a result page that fits your pricing for each body style and add the code [cq-result]. <br>For each body style below, add the page slug you would like the user to be directed to.</p>
+function pp_section_one_callback() {
+    echo '<p>Create a page you would like your car selection form on and add the short code [pp-quote]. <br>Then create a result page that fits your pricing for each body style and add the code [pp-result]. <br>For each body style below, add the page slug you would like the user to be directed to.</p>
           <b>Example: your-page-slug</b>';
 }
 
 // Fields For Admin Page
-function field_suv_callback() {
-    $setting = esc_attr( get_option( 'suv' ) );
-    echo "<input type='text' name='suv' value='$setting' />";
+function pp_field_suv_callback() {
+  $setting = esc_attr( get_option( 'pp-suv' ) );
+  echo "<input type='text' name='pp-suv' value='$setting' />";
 }
-function field_coupe_callback() {
-    $setting = esc_attr( get_option( 'coupe' ) );
-    echo "<input type='text' name='coupe' value='$setting' />";
+function pp_field_coupe_callback() {
+    $setting = esc_attr( get_option( 'pp-coupe' ) );
+    echo "<input type='text' name='pp-coupe' value='$setting' />";
 }
-function field_sedan_callback() {
-    $setting = esc_attr( get_option( 'sedan' ) );
-    echo "<input type='text' name='sedan' value='$setting' />";
+function pp_field_sedan_callback() {
+    $setting = esc_attr( get_option( 'pp-sedan' ) );
+    echo "<input type='text' name='pp-sedan' value='$setting' />";
 }
-function field_hatchback_callback() {
-    $setting = esc_attr( get_option( 'hatchback' ) );
-    echo "<input type='text' name='hatchback' value='$setting' />";
+function pp_field_hatchback_callback() {
+    $setting = esc_attr( get_option( 'pp-hatchback' ) );
+    echo "<input type='text' name='pp-hatchback' value='$setting' />";
 }
-function field_convertible_callback() {
-    $setting = esc_attr( get_option( 'convertible' ) );
-    echo "<input type='text' name='convertible' value='$setting' />";
+function pp_field_convertible_callback() {
+    $setting = esc_attr( get_option( 'pp-convertible' ) );
+    echo "<input type='text' name='pp-convertible' value='$setting' />";
 }
-function field_sport_wagon_callback() {
-    $setting = esc_attr( get_option( 'sport-wagon' ) );
-    echo "<input type='text' name='sport-wagon' value='$setting' />";
+function pp_field_sport_wagon_callback() {
+    $setting = esc_attr( get_option( 'pp-sport-wagon' ) );
+    echo "<input type='text' name='pp-sport-wagon' value='$setting' />";
 }
-
-function field_wagon_callback() {
-    $setting = esc_attr( get_option( 'wagon' ) );
-    echo "<input type='text' name='wagon' value='$setting' />";
+function pp_field_wagon_callback() {
+    $setting = esc_attr( get_option( 'pp-wagon' ) );
+    echo "<input type='text' name='pp-wagon' value='$setting' />";
 }
-
-function field_pickup_callback() {
-    $setting = esc_attr( get_option( 'pickup' ) );
-    echo "<input type='text' name='pickup' value='$setting' />";
+function pp_field_pickup_callback() {
+    $setting = esc_attr( get_option( 'pp-pickup' ) );
+    echo "<input type='text' name='pp-pickup' value='$setting' />";
 }
 
-function field_crew_cab_callback() {
-    $setting = esc_attr( get_option( 'crew-cab' ) );
-    echo "<input type='text' name='crew-cab' value='$setting' />";
+function pp_field_crew_cab_callback() {
+    $setting = esc_attr( get_option( 'pp-crew-cab' ) );
+    echo "<input type='text' name='pp-crew-cab' value='$setting' />";
 }
-
-function field_extended_cab_callback() {
-    $setting = esc_attr( get_option( 'extended-cab' ) );
-    echo "<input type='text' name='extended-cab' value='$setting' />";
+function pp_field_extended_cab_callback() {
+    $setting = esc_attr( get_option( 'pp-extended-cab' ) );
+    echo "<input type='text' name='pp-extended-cab' value='$setting' />";
 }
-
-function field_regular_cab_callback() {
-    $setting = esc_attr( get_option( 'regular-cab' ) );
-    echo "<input type='text' name='regular-cab' value='$setting' />";
+function pp_field_regular_cab_callback() {
+    $setting = esc_attr( get_option( 'pp-regular-cab' ) );
+    echo "<input type='text' name='pp-regular-cab' value='$setting' />";
 }
-
-function field_supercab_callback() {
-    $setting = esc_attr( get_option( 'supercab' ) );
-    echo "<input type='text' name='supercab' value='$setting' />";
+function pp_field_supercab_callback() {
+    $setting = esc_attr( get_option( 'pp-supercab' ) );
+    echo "<input type='text' name='pp-supercab' value='$setting' />";
 }
-
-function field_double_cab_callback() {
-    $setting = esc_attr( get_option( 'double-cab' ) );
-    echo "<input type='text' name='double-cab' value='$setting' />";
+function pp_field_double_cab_callback() {
+    $setting = esc_attr( get_option( 'pp-double-cab' ) );
+    echo "<input type='text' name='pp-double-cab' value='$setting' />";
 }
-
-function field_crewmax_cab_callback() {
-    $setting = esc_attr( get_option( 'crewmax-cab' ) );
-    echo "<input type='text' name='crewmax-cab' value='$setting' />";
+function pp_field_crewmax_cab_callback() {
+    $setting = esc_attr( get_option( 'pp-crewmax-cab' ) );
+    echo "<input type='text' name='pp-crewmax-cab' value='$setting' />";
 }
-
-function field_van_callback() {
-    $setting = esc_attr( get_option( 'van' ) );
-    echo "<input type='text' name='van' value='$setting' />";
+function pp_field_van_callback() {
+    $setting = esc_attr( get_option( 'pp-van' ) );
+    echo "<input type='text' name='pp-van' value='$setting' />";
 }
-
-
-function field_minivan_callback() {
-    $setting = esc_attr( get_option( 'minivan' ) );
-    echo "<input type='text' name='minivan' value='$setting' />";
+function pp_field_minivan_callback() {
+    $setting = esc_attr( get_option( 'pp-minivan' ) );
+    echo "<input type='text' name='pp-minivan' value='$setting' />";
 }
-function field_tq_default_callback() {
-    $setting = esc_attr( get_option( 'tq-default' ) );
-    echo "<input type='text' name='tq-default' value='$setting' />";
+function pp_field_tq_default_callback() {
+    $setting = esc_attr( get_option( 'pp-default' ) );
+    echo "<input type='text' name='pp-default' value='$setting' />";
 }
 
 
 //Admin Page Layout
-function my_options_page() {
+function pp_options_page() {
     ?>
     <div class="wrap">
         <h2>Car Tint Quote</h2>
         <form action="options.php" method="POST">
-            <?php settings_fields( 'my-settings-group' ); ?>
-            <?php do_settings_sections( 'tint-quote' ); ?>
+            <?php settings_fields( 'pp-settings-group' ); ?>
+            <?php do_settings_sections( 'paint-quote' ); ?>
             <?php submit_button(); ?>
         </form>
     </div>
@@ -174,105 +164,105 @@ function my_options_page() {
 
 
 // Setting variables for application 
-function suv() {
-  $select = get_option( 'suv' );
+function pp_suv() {
+  $select = get_option( 'pp-suv' );
   return $select;
 }
-function coupe() {
-  $select = get_option( 'coupe' );
+function pp_coupe() {
+  $select = get_option( 'pp-coupe' );
   return $select;
 }
-function sedan() {
-  $select = get_option( 'sedan' );
+function pp_sedan() {
+  $select = get_option( 'pp-sedan' );
   return $select;
 }
-function hatchback() {
-  $select = get_option( 'hatchback' );
+function pp_hatchback() {
+  $select = get_option( 'pp-hatchback' );
   return $select;
 }
-function convertible() {
-  $select = get_option( 'convertible' );
+function pp_convertible() {
+  $select = get_option( 'pp-convertible' );
   return $select;
 }
-function beetle_convertible() {
-  $select = get_option( 'beetle-convertible' );
+function pp_beetle_convertible() {
+  $select = get_option( 'pp-beetle-convertible' );
   return $select;
 }
-function sport_wagon() {
-  $select = get_option( 'sport-wagon' );
+function pp_sport_wagon() {
+  $select = get_option( 'pp-sport-wagon' );
   return $select;
 }
-function wagon() {
-  $select = get_option( 'wagon' );
+function pp_wagon() {
+  $select = get_option( 'pp-wagon' );
   return $select;
 }
-function crew_cab() {
-  $select = get_option( 'crew-cab' );
+function pp_crew_cab() {
+  $select = get_option( 'pp-crew-cab' );
   return $select;
 }
-function extended_cab() {
-  $select = get_option( 'extended-cab' );
+function pp_extended_cab() {
+  $select = get_option( 'pp-extended-cab' );
   return $select;
 }
-function regular_cab() {
-  $select = get_option( 'regular-cab' );
+function pp_regular_cab() {
+  $select = get_option( 'pp-regular-cab' );
   return $select;
 }
-function supercab() {
-  $select = get_option( 'supercab' );
+function pp_supercab() {
+  $select = get_option( 'pp-supercab' );
   return $select;
 }
-function double_cab() {
-  $select = get_option( 'double-cab' );
+function pp_double_cab() {
+  $select = get_option( 'pp-double-cab' );
   return $select;
 }
-function van() {
-  $select = get_option( 'van' );
+function pp_van() {
+  $select = get_option( 'pp-van' );
   return $select;
 }
-function minivan() {
-  $select = get_option( 'minivan' );
+function pp_minivan() {
+  $select = get_option( 'pp-minivan' );
   return $select;
 }
-function tq_default() {
-  $select = get_option( 'tq-default' );
+function pp_default() {
+  $select = get_option( 'pp-default' );
   return $select;
 }
 
 /*=======================================================================================
-Edmunds JSON APIwill populate select input options 
+Edmunds JSON API will populate select input options 
 and return list of specification for the car selected
 ========================================================================================== */
 
-Class edmundsAPI{
+Class pp_edmundsAPI{
 
 	static $add_script;
 
-	static function init() {
+	static function pp_init() {
 
 		//Register ShortCode
-		add_shortcode("tq-quote", 	array(__CLASS__, 'tq_quote' )); 
+		add_shortcode("pp-quote", 	array(__CLASS__, 'pp_quote' )); 
 		 
 		//Load javascript in wp_footer
 		
-		add_action('init', 		array(__CLASS__, 'register_script' ));
+		add_action('pp_init', 		array(__CLASS__, 'pp_register_script' ));
 		
-		add_action('wp_footer', array(__CLASS__, 'print_script' ));
+		add_action('wp_footer', array(__CLASS__, 'pp_print_script' ));
 	}
 	
-static function tq_quote() {
+static function pp_quote() {
 		//Trigger javascript scripts to load
 		self::$add_script = true;
     include( plugin_dir_path( __FILE__ ) . 'dropdowns.php');
    ;}
 
 	//Include necessary javascript files
-	static function register_script() {
+	static function pp_register_script() {
     
 	}
 
 	//check if the short codes were used, print js if required
-	static function print_script() {
+	static function pp_print_script() {
 
 		//Only load javascript if the short code events were triggered
 		if ( ! self::$add_script )
@@ -281,11 +271,11 @@ static function tq_quote() {
 		wp_print_scripts('edmunds-api-js');
 
 		//initialize the edmunds objects
-		self::edmunds_init();
+		self::pp_edmunds_init();
 	}
 
 	//Output required edmunds javascript to footer.
-	static function edmunds_init()
+	static function pp_edmunds_init()
 	{
 		?>
 
@@ -297,54 +287,79 @@ Redirects user to related page based on the body style of the car they select
 
 //I'm wrapping the code in a function closure to keep it out of the global namespace. That way its variables can't interfere or be interfered with by other js scripts.
 (function($) {
-    //instead of repeating the href over and over again in the "select" object, we pull it dynamically from the global javascript object ("window")
     var root = "<?php echo home_url(); ?>/";
     var select = {
-        "SUV": "<?php echo suv(); ?>",
-        "Coupe": "<?php echo coupe(); ?>",
-        "Sedan" :  "<?php echo sedan(); ?>",
-        "Hatchback" :  "<?php echo hatchback(); ?>",
-        "Convertible": "<?php echo convertible(); ?>",
-        "Continental GT Speed Convertible": "<?php echo convertible(); ?>",
-        "Beetle Convertible": "<?php echo convertible(); ?>",
-        "TSX Sport Wagon": "<?php echo sport_wagon(); ?>",
-        "CTS-V Coupe": "<?php echo coupe(); ?>",
-        "CTS Coupe": "<?php echo coupe(); ?>",
-        "CTS-V Wagon": "<?php echo wagon(); ?>",
-        "CTS Wagon": "<?php echo wagon(); ?>",
-        "Wagon": "<?php echo wagon(); ?>",
-        "Crew Cab": "<?php echo crew_cab(); ?>",
-        "Extended Cab": "<?php echo extended_cab(); ?>",
-        "Regular Cab": "<?php echo regular_cab(); ?>",
-        "SuperCab": "<?php echo supercab(); ?>",
-        "Double Cab": "<?php echo double_cab(); ?>",
-        "CrewMax Cab": "<?php echo extended_cab(); ?>",
-        "Quad Cab": "<?php echo supercab(); ?>",
-        "Club Cab": "p<?php echo extended_cab(); ?>",
-        "Van": "<?php echo van(); ?>",
-        "Ram Van": "<?php echo van(); ?>",
-        "Minivan": "<?php echo minivan(); ?>"
+    "SUV": "<?php echo pp_suv(); ?>",
+    "Coupe": "<?php echo pp_coupe(); ?>",
+    "Sedan": "<?php echo pp_sedan(); ?>",
+    "Hatchback": "<?php echo pp_hatchback(); ?>",
+    "TSX Sport Wagon": "<?php echo pp_sport_wagon(); ?>",
+    "Convertible": "<?php echo pp_convertible(); ?>",
+    "Wagon": "<?php echo pp_wagon(); ?>",
+    "Continental GT Speed Convertible": "<?php echo pp_convertible(); ?>",
+    "Continental Supersports Convertible": "<?php echo pp_convertible(); ?>",
+    "Supersports Convertible ISR": "<?php echo pp_convertible(); ?>",
+    "Estate Wagon": "<?php echo pp_wagon(); ?>",
+    "Minivan": "<?php echo pp_minivan(); ?>",
+    "ATS Coupe": "<?php echo pp_coupe(); ?>",
+    "CTS Coupe": "<?php echo pp_coupe(); ?>",
+    "CTS Wagon": "<?php echo pp_wagon(); ?>",
+    "CTS-V Coupe": "<?php echo pp_coupe(); ?>",
+    "CTS-V Wagon": "<?php echo pp_wagon(); ?>",
+    "Crew Cab": "<?php echo pp_crew_cab(); ?>",
+    "Regular Cab": "<?php echo pp_regular_cab(); ?>",
+    "Extended Cab": "<?php echo pp_extended_cab(); ?>",
+    "Chevy Van": "<?php echo pp_van(); ?>",
+    "Chevy Van Classic": "<?php echo pp_van(); ?>",
+    "Van": "<?php echo van(); ?>",
+    "Lumina Minivan": "<?php echo pp_minivan(); ?>",
+    "Double Cab": "<?php echo pp_double_cab(); ?>",
+    "Club Cab": "<?php echo pp_extended_cab(); ?>",
+    "Quad Cab": "<?php echo pp_supercab(); ?>",
+    "Mega Cab": "<?php echo pp_supercab(); ?>",
+    "Ram Van": "<?php echo pp_van(); ?>",
+    "E-Series Van": "<?php echo pp_van(); ?>",
+    "SuperCab": "<?php echo pp_supercab(); ?>",
+    "SuperCrew": "<?php echo pp_extended_cab(); ?>",
+    "Transit Van": "<?php echo pp_van(); ?>",
+    "Elantra Coupe": "<?php echo pp_coupe(); ?>",
+    "Genesis Coupe": "<?php echo pp_coupe(); ?>",
+    "G Convertible": "<?php echo pp_convertible(); ?>",
+    "G Coupe": "<?php echo pp_coupe(); ?>",
+    "G Sedan": "<?php echo pp_sedan(); ?>",
+    "G37 Convertible": "<?php echo pp_convertible(); ?>",
+    "G37 Coupe": "<?php echo pp_coupe(); ?>",
+    "G37 Sedan": "<?php echo pp_sedan(); ?>",
+    "Q60 Convertible": "<?php echo pp_convertible(); ?>",
+    "Q60 Coupe": "<?php echo pp_coupe(); ?>",
+    "Koup": "<?php echo pp_coupe(); ?>",
+    "GranTurismo Convertible": "<?php echo pp_convertible(); ?>",
+    "Cab Plus": "<?php echo pp_extended_cab(); ?>",
+    "Cab Plus 4": "<?php echo pp_extended_cab(); ?>",
+    "650S Coupe": "<?php echo pp_coupe(); ?>",
+    "King Cab":  "<?php echo pp_supercab(); ?>", // ****** Add
+    "Promaster Cargo Van": "<?php echo pp_van(); ?>", // ****** Add
+    "Promaster Window Van": "<?php echo pp_van(); ?>", // ****** Add
+    "Phantom Coupe": "<?php echo pp_coupe(); ?>",
+    "Xtracab": "<?php echo pp_double_cab(); ?>",
+    "Access Cab": "<?php echo pp_double_cab(); ?>",  // ****** Add
+    "CrewMax Cab": "<?php echo pp_extended_cab(); ?>",
+    "Beetle Convertible": "<?php echo pp_convertible(); ?>",
     };
 
     //Make a helper function to set the href to avoid repeat code
     function setWindowLocation(path) {
         window.location.href = root + path;
     }
-    console.log('body');
+    
     $('#get-quote').click(function (){
-        //use of the selector here is going to be very slow. Need a way to call just the body style into a div with id.
         var body = $('#iq-body').val();
-         var doors = $("td:contains('Doors:')").next().text();
         var make = $('#iq-make').val();
         var model = $('#iq-model').val();
-        
-        console.log(make);
-        console.log(model);
          $.removeCookie('style', { path: '/' });  
          $.removeCookie('make', { path: '/' }); 
          $.removeCookie('model', { path: '/' });          
-        //Here I'm using the "in" operator to determine whether or not the key "body" exists in the object "select"
-        //the equality operator "==" will only check whether or not "body" has the same elements as  "select"                    
+        //determine whether or not the key "body" exists in the object "select"                  
         if (body in select && body) {
           $.cookie('make', make, { expires: 7, path: '/' });
           $.cookie('model', model, { expires: 7, path: '/' });
@@ -353,7 +368,29 @@ Redirects user to related page based on the body style of the car they select
         } else {
             setWindowLocation("<?php echo tq_default(); ?>");
           }                                      
+    });  
+    $('#iq-body-select').hide();
+    $('#iq-body-select').removeClass('hide');
+    $('#iq-not-found').click(function (){
+      $('#iq-body-select').slideDown(200);  
     });
+    $('#iq-body-alt').change(function(){
+        var self = $(this);
+        var body = self.val();
+        console.log(body);
+        $.removeCookie('style', { path: '/' });  
+         $.removeCookie('make', { path: '/' }); 
+         $.removeCookie('model', { path: '/' });          
+        if (body in select && body) {
+          $.cookie('make', body, { expires: 7, path: '/' });
+           $.cookie('model', 'Instant Quote', { expires: 7, path: '/' });
+   
+            setWindowLocation(select[body]);
+            console.log(body);
+        } else {
+            setWindowLocation("<?php echo pp_default(); ?>");
+          }         
+      }); 
 })(jQuery);
 
 	</script>
@@ -365,10 +402,10 @@ Redirects user to related page based on the body style of the car they select
 Shortcode for result pages, 
 =================================================================*/
 
-//Register ShortCode [tq-result]
-add_shortcode('tq-result', 'tq_result' ); 
+//Register ShortCode [pp-result]
+add_shortcode('pp-result', 'pp_result' ); 
      
-function tq_result($atts) {
+function pp_result($atts) {
 return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
 <script>
     jQuery(document).ready(function($) {
@@ -384,6 +421,6 @@ return "<h1 class='selected-name title-1 p-l pad-10px'></h1>
 
 
 //Initilazed the object
-edmundsAPI::init();
+pp_edmundsAPI::pp_init();
 
 ?>
