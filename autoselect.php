@@ -109,7 +109,6 @@ function pp_field_pickup_callback() {
     $setting = esc_attr( get_option( 'pp-pickup' ) );
     echo "<input type='text' name='pp-pickup' value='$setting' />";
 }
-
 function pp_field_crew_cab_callback() {
     $setting = esc_attr( get_option( 'pp-crew-cab' ) );
     echo "<input type='text' name='pp-crew-cab' value='$setting' />";
@@ -147,7 +146,6 @@ function pp_field_tq_default_callback() {
     echo "<input type='text' name='pp-default' value='$setting' />";
 }
 
-
 //Admin Page Layout
 function pp_options_page() {
     ?>
@@ -161,7 +159,6 @@ function pp_options_page() {
     </div>
     <?php
 }
-
 
 // Setting variables for application 
 function pp_suv() {

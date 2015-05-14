@@ -13,7 +13,7 @@
              ng-init="loadData()">
       <form id="MakeForm">
         <div class="form-group">
-          <label>Make *</label><br>
+          <label>Make*</label><br>
           <div cg-busy="{promise:spinner,message:'Loading Selections',minDuration:600}"></div>
           <select id="iq-make" class="form-control" ng-model="request.make" ng-change="loadSectionData('Model')">
             <option ng-repeat="choice in result.makes" ng-value="choice.niceName">
