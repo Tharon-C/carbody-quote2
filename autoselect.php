@@ -2,7 +2,7 @@
 /*
 Plugin Name: Car Body Quote 2
 Plugin URI: http://taglinegroup.com
-Description: Add short code [tq-quote] to the page you want the app to appear. Create different pricing pages with short code [tq-result] at the top and add the slug to a corresponding bodystyle in the plugin admin page (Settings/ Tint Quote). User selects car year, make, model, and trim to be direceted to a page based on criteria, Built on Car Query API. 
+Description: Add short code [pp-quote] to the page you want the app to appear. Create different pricing pages with short code [pp-result] at the top and add the slug to a corresponding bodystyle in the plugin admin page (Settings/ Tint Quote). User selects car year, make, model, and trim to be direceted to a page based on criteria, Built on Car Query API. 
 Author: Tharon Carlson
 */
 add_action('wp_enqueue_scripts', 'pp_styles'); // Add Theme Stylesheet
